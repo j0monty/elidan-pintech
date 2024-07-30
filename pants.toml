@@ -1,0 +1,19 @@
+[GLOBAL]
+pants_version = "2.21.0"
+backend_packages = [
+    "pants.backend.python",
+    "pants.backend.python.mixed_interpreter_constraints",
+    "pants.backend.experimental.python.lint.ruff.check",
+    "pants.backend.experimental.python.lint.ruff.format",
+    "pants.backend.python.typecheck.mypy",
+]
+
+[python-bootstrap]
+search_path = ["<PYENV_LOCAL>", "/usr/bin"]
+
+[anonymous-telemetry]
+enabled = false
+
+[python]
+interpreter_constraints = ["CPython==3.12.*"]
+pip_version = "latest"
