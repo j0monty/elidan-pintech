@@ -5,31 +5,38 @@ blah blah blah...
 ## Structure
 
 ```
-- scripts/
-- src/
-  - common/ (library shared by many services)
-  - services/
-    - pintech_api (main API service)
-  - tests/
+├── BUILD
+├── LICENSE
+├── README.md
+├── pants.toml
+├── scripts/
+├── src
+│   ├── docker
+│   │   ├── mongo/                - mongo container
+│   │   └── pintech_api-server/   - pintech api container
+│   ├── python
+│   │   ├── common/               - where common shared libs go
+│   │   ├── services/             - 1 service per folder
+│   │   │   └── pintech_api/      - pintech_api fastapi service
+│   │   └── tests                 - unit tests
+└── start-pintech.sh              - script to start services
 ```
 
 ## Commands
 
-To run linters / mypy, formatting, etc.
+To run linters / mypy, formatting, etc. install pre-commit hooks
 
 ```bash
-$ pants check ::    # runs mypy on all files
-$ pants fmt ::      # ruff format on all files
-$ pants lint ::     # runs ruff check & ruff format on all files
+$ pre-commit install
 ```
 
 To run the PinTech API:
 
 ```bash
-$ pants run src/services/pintech_api/main.py
+$ ./start-pintech.sh
 ```
 
-To build packages or containers, etc.
+To build packages, containers, etc (WIP)
 
 ```bash
 $ pants package ::
@@ -39,6 +46,8 @@ $ pants package ::
 
 1. Install `pants`
 2. Setup virtual env (pyenv, etc) for python 3.12.x
+3. Install docker desktop
+4. install dependencies using poetry install in src/python/services/pintech_api/
 
 ## Setting up IDE and using pants build
 
@@ -49,12 +58,6 @@ If you use a code-aware editor or IDE, such as PyCharm or VSCode, you may want t
 There are two scripts in `scripts/` folder that can help with this:
 
 More info on this here: https://www.pantsbuild.org/2.18/docs/using-pants/setting-up-an-ide
-
-```bash
-$ ./scripts/expose_library_roots_to_ide.sh
-# essentially
-$ ./pants export ::
-```
 
 pants goals:
 
