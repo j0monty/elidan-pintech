@@ -1,0 +1,87 @@
+repos:
+  # Miscellaneous checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+        exclude: "mantium/api/routes/well_known/ai_plugin/.*\\.json$"
+      - id: check-toml
+      - id: check-json
+        exclude: .vscode/.+
+      - id: check-yaml
+        args: ["--unsafe"]
+
+      - id: pretty-format-json
+        args:
+          - --no-ensure-ascii
+          - --autofix
+        exclude: .vscode/.+
+
+  # isort alphabetizes your python imports and groups them
+  # The 'black' profile helps us avoid disagreements with the blue formatter.
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        exclude: "tests/data/code_extracting/.*$"
+        types: [python]
+        args:
+          - -l=120
+          - --py=39
+          - --profile=black
+          - --filter-files
+          - --skip-gitignore
+
+  # blue auto-formats python files
+  - repo: https://github.com/grantjenks/blue.git
+    rev: v0.9.1
+    hooks:
+      - id: blue
+        types: [python]
+        args:
+          - -l120
+          - -tpy39
+          - --exclude="(\.pantsd|\.dist)"
+
+  # pydocstyle checks docstring styles after blue is done reformatting
+  - repo: https://github.com/pycqa/pydocstyle
+    rev: 6.3.0
+    hooks:
+      - id: pydocstyle
+        types: [python]
+        args:
+          - --config=.pydocstyle
+
+  # After blue is done reformatting everything, double check it with flake8
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.1.0
+    hooks:
+      - id: flake8
+        types: [python]
+        args:
+          - --max-line-length=120
+          - --extend-ignore=E203
+
+  - repo: local
+    hooks:
+      - id: pants-lint
+        name: Pants Linter
+        entry: pants lint
+        language: system
+        pass_filenames: false
+        always_run: true
+
+      - id: pants-check
+        name: Pants Check
+        entry: pants check
+        language: system
+        pass_filenames: false
+        always_run: true
+
+      - id: pants-test
+        name: Pants Test
+        entry: pants test
+        language: system
+        pass_filenames: false
+        always_run: true

@@ -4,9 +4,16 @@ backend_packages = [
     "pants.backend.python",
     "pants.backend.python.mixed_interpreter_constraints",
     "pants.backend.experimental.python.lint.ruff.check",
-    "pants.backend.experimental.python.lint.ruff.format",
     "pants.backend.python.typecheck.mypy",
+    "pants.backend.docker",
+    "pants.backend.shell",
 ]
+process_execution_local_parallelism = 2
+dynamic_ui = true
+colors = true
+
+[source]
+root_patterns = ["src/*"]
 
 [python-bootstrap]
 search_path = ["<PYENV_LOCAL>", "/usr/bin"]
@@ -17,3 +24,12 @@ enabled = false
 [python]
 interpreter_constraints = ["CPython==3.12.*"]
 pip_version = "latest"
+
+[python.resolves]
+pytest = "3rdparty/python/pytest-lock.txt"
+
+[pytest]
+args = ["-vv", "-rA", "-W", "ignore::DeprecationWarning"]
+
+[test]
+output = "all"

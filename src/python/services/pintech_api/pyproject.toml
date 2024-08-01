@@ -8,9 +8,11 @@ authors = ["m0nty <j.monty@gmail.com>"]
 python = "^3.12"
 fastapi = "^0.111.1"
 uvicorn = "^0.30.3"
+pymongo = "^4.8.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.2"
+pre-commit = "^3.8.0"
 
 [build-system]
 requires = ["poetry-core"]

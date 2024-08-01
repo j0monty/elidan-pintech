@@ -1,28 +1,28 @@
 import logging
 import os
-from typing import Any, Awaitable, Callable, cast
 import uuid
+from typing import Any, Awaitable, Callable, cast
 
-from fastapi import Request, Response
 import structlog
+from fastapi import Request, Response
 from structlog.types import Processor
 
-uvicorn_error = logging.getLogger("uvicorn.error")
+uvicorn_error = logging.getLogger('uvicorn.error')
 uvicorn_error.disabled = True
-uvicorn_access = logging.getLogger("uvicorn.access")
+uvicorn_access = logging.getLogger('uvicorn.access')
 uvicorn_access.disabled = True
 
 shared_processors: list[Processor] = [
     structlog.contextvars.merge_contextvars,
     structlog.processors.add_log_level,
     structlog.processors.format_exc_info,
-    structlog.processors.TimeStamper(fmt="iso", utc=False),
+    structlog.processors.TimeStamper(fmt='iso', utc=False),
 ]
 
-env = os.environ.get("APP_ENV", "development")
+env = os.environ.get('APP_ENV', 'development')
 processors: list[Processor] | None = None
 
-if env == "development":
+if env == 'development':
     processors = shared_processors + [
         structlog.dev.ConsoleRenderer(),
     ]
@@ -38,9 +38,8 @@ if processors is not None:
     )
 
 
-async def log_request_helper(
-    request: Request, call_next: Callable[[Request], Awaitable[Response]]
-) -> Response:
+async def log_request_helper(request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
+    """FastAPI Middleware which will handle logging each request."""
     client = request.client
     if client is not None:
         client_host = client.host
@@ -61,12 +60,12 @@ async def log_request_helper(
     log = structlog.get_logger()
 
     # Exclude /healthcheck endpoint from producing logs
-    if request.url.path != "/healthcheck":
+    if request.url.path != '/healthcheck':
         if 400 <= response.status_code < 500:
-            log.warn("Client error")
+            log.warn('Client error')
         elif response.status_code >= 500:
-            log.error("Server error")
+            log.error('Server error')
         else:
-            log.info("OK")
+            log.info('OK')
 
     return response
