@@ -27,7 +27,7 @@ repos:
         args:
           - -l120
           - -tpy39
-          - --exclude="(\.pantsd|\.dist)"
+          - --exclude="(\.pantsd|\.dist|\.vscode|\.mypy_cache)"
 
   # After blue is done reformatting everything, double check it with flake8
   - repo: https://github.com/pycqa/flake8
