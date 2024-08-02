@@ -2,18 +2,19 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Pants",
-            "request": "launch",
-            "module": "pants",
-            "args": [
-                "run",
-                "src/python/services/pintech_api:pintech_api-server"
-            ],
-            "cwd": "${workspaceFolder}",
-            "env": {
-                "PANTS_CONCURRENT": "true"
+            "name": "Python: Attach to process",
+            "type": "debugpy",
+            "request": "attach",
+            "connect": {
+                "host": "127.0.0.1",
+                "port": 5678
             },
-            "console": "integratedTerminal"
+            "pathMappings": [
+                {
+                    "localRoot": "${workspaceFolder}",
+                    "remoteRoot": "."
+                }
+            ]
         }
     ]
 }
