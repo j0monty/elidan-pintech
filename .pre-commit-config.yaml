@@ -18,21 +18,6 @@ repos:
           - --autofix
         exclude: .vscode/.+
 
-  # isort alphabetizes your python imports and groups them
-  # The 'black' profile helps us avoid disagreements with the blue formatter.
-  - repo: https://github.com/pycqa/isort
-    rev: 5.13.2
-    hooks:
-      - id: isort
-        exclude: "tests/data/code_extracting/.*$"
-        types: [python]
-        args:
-          - -l=120
-          - --py=39
-          - --profile=black
-          - --filter-files
-          - --skip-gitignore
-
   # blue auto-formats python files
   - repo: https://github.com/grantjenks/blue.git
     rev: v0.9.1
@@ -43,15 +28,6 @@ repos:
           - -l120
           - -tpy39
           - --exclude="(\.pantsd|\.dist)"
-
-  # pydocstyle checks docstring styles after blue is done reformatting
-  - repo: https://github.com/pycqa/pydocstyle
-    rev: 6.3.0
-    hooks:
-      - id: pydocstyle
-        types: [python]
-        args:
-          - --config=.pydocstyle
 
   # After blue is done reformatting everything, double check it with flake8
   - repo: https://github.com/pycqa/flake8
@@ -67,21 +43,35 @@ repos:
     hooks:
       - id: pants-lint
         name: Pants Linter
-        entry: pants lint
+        entry: sh -c "pants lint ::"
         language: system
         pass_filenames: false
         always_run: true
 
       - id: pants-check
         name: Pants Check
-        entry: pants check
+        entry: sh -c "pants check ::"
         language: system
         pass_filenames: false
         always_run: true
 
       - id: pants-test
         name: Pants Test
-        entry: pants test
+        entry: sh -c "pants test ::"
         language: system
         pass_filenames: false
         always_run: true
+
+  - repo: https://github.com/semgrep/pre-commit
+    rev: "v1.82.0"
+    hooks:
+      - id: semgrep
+        # See https://semgrep.dev/explore to select a ruleset and copy its URL
+        args:
+          [
+            "--config",
+            "auto",
+            "--error",
+            "--skip-unknown-extensions",
+            "--quiet",
+          ]

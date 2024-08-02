@@ -14,8 +14,8 @@ def test_healthcheck_success():
         mock_client.return_value.admin.command.return_value = True
 
         response = test_client.get('/healthcheck')
-        assert response.status_code == HTTPStatus.OK
-        assert response.json() == {'API': 'OK', 'Datastore': 'OK'}
+        assert response.status_code == HTTPStatus.OK                # nosec B101
+        assert response.json() == {'API': 'OK', 'Datastore': 'OK'}  # nosec B101
 
 
 def test_healthcheck_failure():
@@ -24,11 +24,11 @@ def test_healthcheck_failure():
         mock_client.return_value.admin.command.side_effect = ConnectionFailure('Connection failed')
 
         response = test_client.get('/healthcheck')
-        assert response.status_code == HTTPStatus.SERVICE_UNAVAILABLE
-        assert response.json() == {'API': 'OK', 'Datastore': 'FAILED'}
+        assert response.status_code == HTTPStatus.SERVICE_UNAVAILABLE   # nosec B101
+        assert response.json() == {'API': 'OK', 'Datastore': 'FAILED'}  # nosec B101
 
 
 def test_version():
     response = test_client.get('/version')
-    assert response.status_code == HTTPStatus.OK
-    assert response.json() == {'Version': '0.1'}
+    assert response.status_code == HTTPStatus.OK  # nosec B101
+    assert response.json() == {'Version': '0.1'}  # nosec B101

@@ -2,34 +2,48 @@
 pants_version = "2.21.0"
 backend_packages = [
     "pants.backend.python",
-    "pants.backend.python.mixed_interpreter_constraints",
-    "pants.backend.experimental.python.lint.ruff.check",
-    "pants.backend.python.typecheck.mypy",
     "pants.backend.docker",
     "pants.backend.shell",
+    "pants.backend.experimental.python.lint.ruff.check",
+    "pants.backend.python.lint.isort",
+    "pants.backend.python.lint.pydocstyle",
+    "pants.backend.python.lint.pyupgrade",
+    "pants.backend.python.typecheck.mypy",
 ]
 process_execution_local_parallelism = 2
 dynamic_ui = true
 colors = true
 
-[source]
-root_patterns = ["src/*"]
-
-[python-bootstrap]
-search_path = ["<PYENV_LOCAL>", "/usr/bin"]
-
-[anonymous-telemetry]
-enabled = false
-
 [python]
 interpreter_constraints = ["CPython==3.12.*"]
 pip_version = "latest"
 
+[python-bootstrap]
+search_path = ["<PYENV_LOCAL>", "/usr/bin"]
+
 [python.resolves]
 pytest = "3rdparty/python/pytest-lock.txt"
+
+[source]
+root_patterns = ["src/*"]
+
+[anonymous-telemetry]
+enabled = false
 
 [pytest]
 args = ["-vv", "-rA", "-W", "ignore::DeprecationWarning"]
 
 [test]
 output = "all"
+
+[isort]
+args = [
+    "-l=120",
+    "--py=39",
+    "--profile=black",
+    "-filter-files",
+    "--skip-gitignore",
+]
+
+[pydocstyle]
+args = ["--config=.pydocstyle"]
