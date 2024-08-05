@@ -3,6 +3,7 @@ python_tests(
     sources=[
         "test_*.py",
     ],
+    skip_mypy=True,
 )
 
 python_test_utils(

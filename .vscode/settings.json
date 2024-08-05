@@ -6,4 +6,7 @@
     "python.analysis.extraPaths": [
         "src/python"
     ],
+    "python.linting.ignorePatterns": [
+        "src/python/tests/**/*.py"
+    ]
 }

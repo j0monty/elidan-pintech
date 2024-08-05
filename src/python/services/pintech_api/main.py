@@ -48,13 +48,13 @@ async def logger_middleware(request: Request, call_next: Callable[[Request], Awa
     response_model=dict,
     include_in_schema=False,
 )
-async def health_check():
+async def health_check() -> JSONResponse:
     """Verify API is running and check MongoDB connection."""
     status = {'API': 'OK', 'Datastore': 'OK'}
     http_status = HTTPStatus.OK
 
     # Check MongoDB connection
-    client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=MONGO_TIMEOUT * 1000)
+    client: MongoClient = MongoClient(MONGO_URI, serverSelectionTimeoutMS=MONGO_TIMEOUT * 1000)
     try:
         # Use asyncio.wait_for to set a timeout for the MongoDB operation
         await asyncio.wait_for(asyncio.to_thread(client.admin.command, 'ismaster'), timeout=MONGO_TIMEOUT)
