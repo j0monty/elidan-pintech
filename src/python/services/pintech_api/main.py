@@ -1,30 +1,27 @@
 import asyncio
 from http import HTTPStatus
-from typing import Awaitable, Callable, Final
+from typing import Awaitable, Callable
 
-import structlog
 import uvicorn
-from common.logger import log_request_helper
+from common.logger import get_logger, log_request_helper
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError
+from services.pintech_api.config import PintechAPISettings
 
-API_DOCS_TITLE = 'PinTech API'
-API_DOCS_DESC = 'PinTech API Documentation'
-API_VER: Final[str] = '0.1'
-MONGO_URI = 'mongodb://localhost:27017'
-MONGO_TIMEOUT = 5  # 5 second timeout
+settings: PintechAPISettings = PintechAPISettings.load()
+logger = get_logger(__name__)
 
 app = FastAPI(
-    title=API_DOCS_TITLE,
-    description=API_DOCS_DESC,
-    version=API_VER,
-    docs_url=None,
-    redoc_url=None,
+    title=settings.api_docs_title,
+    description=settings.api_docs_desc,
+    version=settings.api_ver,
+    # docs_url=None,
+    # redoc_url=None,
 )
-logger = structlog.get_logger()
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -54,10 +51,10 @@ async def health_check() -> JSONResponse:
     http_status = HTTPStatus.OK
 
     # Check MongoDB connection
-    client: MongoClient = MongoClient(MONGO_URI, serverSelectionTimeoutMS=MONGO_TIMEOUT * 1000)
+    client: MongoClient = MongoClient(settings.mongo_uri, serverSelectionTimeoutMS=settings.mongo_timeout * 1000)
     try:
         # Use asyncio.wait_for to set a timeout for the MongoDB operation
-        await asyncio.wait_for(asyncio.to_thread(client.admin.command, 'ismaster'), timeout=MONGO_TIMEOUT)
+        await asyncio.wait_for(asyncio.to_thread(client.admin.command, 'ismaster'), timeout=settings.mongo_timeout)
     except (ConnectionFailure, ServerSelectionTimeoutError, asyncio.TimeoutError):
         status['Datastore'] = 'FAILED'
         http_status = HTTPStatus.SERVICE_UNAVAILABLE
@@ -75,7 +72,7 @@ async def health_check() -> JSONResponse:
 )
 async def pintech_api_version() -> dict:
     """Return API version."""
-    return {'Version': API_VER}
+    return {'Version': settings.api_ver}
 
 
 if __name__ == '__main__':

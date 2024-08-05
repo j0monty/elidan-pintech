@@ -5,6 +5,7 @@ python_sources(
     dependencies=[
         # we explicitly depend on the sources in our common module
         "src/python/common:lib",
+        "src/python/config:lib",
         # and also on this own module"s deps, specified above
         "src/python/services/pintech_api:deps",
     ],

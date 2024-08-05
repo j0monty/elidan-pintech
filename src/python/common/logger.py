@@ -38,6 +38,19 @@ if processors is not None:
     )
 
 
+def get_logger(name: str = __name__) -> structlog.BoundLogger:
+    """
+    Get a logger instance configured with the project's settings.
+
+    Args:
+        name (str): The name of the logger, typically __name__.
+
+    Returns:
+        structlog.BoundLogger: A configured structlog logger instance.
+    """
+    return structlog.get_logger(name)
+
+
 async def log_request_helper(request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
     """FastAPI Middleware which will handle logging each request."""
     client = request.client
@@ -57,7 +70,7 @@ async def log_request_helper(request: Request, call_next: Callable[[Request], Aw
         status_code=response.status_code,
     )
 
-    log = structlog.get_logger()
+    log = get_logger('fastapi.middleware.request')
 
     # Exclude /healthcheck endpoint from producing logs
     if request.url.path != '/healthcheck':

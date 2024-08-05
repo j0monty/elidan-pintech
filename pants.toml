@@ -25,7 +25,7 @@ search_path = ["<PYENV_LOCAL>", "/usr/bin"]
 pytest = "3rdparty/python/pytest-lock.txt"
 
 [source]
-root_patterns = ["src/*"]
+root_patterns = ["src/python"]
 
 [anonymous-telemetry]
 enabled = false
@@ -46,4 +46,8 @@ args = [
 ]
 
 [pydocstyle]
-args = ["--config=.pydocstyle"]
+config = "build_support/.pydocstyle"
+
+[mypy]
+config = "./build_support/.mypy.ini"
+args = ["--warn-unused-configs"]
