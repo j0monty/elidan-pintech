@@ -1,7 +1,7 @@
 import os
 
 from common.logger import get_logger
-from dynaconf import Dynaconf  # type: ignore
+from dynaconf import Dynaconf
 from pydantic import BaseModel
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
