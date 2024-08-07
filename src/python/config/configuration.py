@@ -5,7 +5,7 @@ from dynaconf import Dynaconf  # type: ignore
 from pydantic import BaseModel
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
-log = get_logger(__name__)
+logger = get_logger(__name__)
 
 
 class Settings(BaseModel):
@@ -22,18 +22,20 @@ class Settings(BaseModel):
         Returns:
             Settings: An instance of the Settings class with filtered configuration.
         """
-        log.debug('Loading dynaconf...')
+        logger.info(f'Loading settings with prefix: {prefix}')
         dynaconf_settings = Dynaconf(
             envvar_prefix='DYNACONF',
             settings_files=[os.path.join(current_dir, 'settings.toml'), os.path.join(current_dir, '.secrets.toml')],
             environments=True,
         )
 
+        logger.debug(f'All settings: {dynaconf_settings.as_dict()}')
+
         # Filter settings based on the prefix
         filtered_settings = {
             k[len(prefix) + 1 :]: v for k, v in dynaconf_settings.as_dict().items() if k.startswith(f'{prefix}_')
         }
-
+        logger.debug(f'Filtered settings for {prefix}: {filtered_settings}')
         return cls(**filtered_settings)
 
     class Config:
@@ -51,7 +53,10 @@ def get_component_settings(component_name: str) -> Settings:
     Returns:
         Settings: An instance of the Settings class for the specified component.
     """
-    return Settings.from_dynaconf(component_name.upper())
+    logger.info(f'Getting settings for component: {component_name}')
+    settings = Settings.from_dynaconf(component_name.upper())
+    logger.debug(f'Retrieved settings for {component_name}: {settings.dict()}')
+    return settings
 
 
 # `envvar_prefix` = export envvars with `export DYNACONF_FOO=bar`.

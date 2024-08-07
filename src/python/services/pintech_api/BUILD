@@ -11,11 +11,18 @@ python_sources(
     ],
 )
 
+
+resources(
+    name="config_files",
+    sources=["uvicorn_disable_logging.json"],
+)
+
 pex_binary(
     name="pintech_api-server",
     entry_point="main.py",
     dependencies=[
         ":lib",
+        ":config_files"
     ],
     restartable=True,
 )
@@ -25,6 +32,7 @@ pex_binary(
     entry_point="migrate.py",
     dependencies=[
         ":lib",
+        ":config_files"
     ],
     restartable=True,
 )
