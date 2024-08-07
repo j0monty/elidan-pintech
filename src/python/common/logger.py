@@ -2,7 +2,7 @@ import logging
 import sys
 import time
 from types import TracebackType
-from typing import Any, Awaitable, Callable, Optional, Type, cast
+from typing import Any, Awaitable, Callable, Dict, Optional, Type, cast
 
 import structlog
 from asgi_correlation_id.context import correlation_id
@@ -250,3 +250,58 @@ def setup_logging(json_logs: bool = False, log_level: str = 'INFO') -> None:
         root_logger.error('Uncaught exception', exc_info=(exc_type, exc_value, exc_traceback))
 
     sys.excepthook = handle_exception
+
+
+def get_log_config(log_level: str) -> Dict[str, Any]:
+    """
+    Generate a logging configuration dictionary for Uvicorn.
+
+    This function creates a logging configuration based on the provided log level.
+    The configuration includes settings for the default logger and the access logger.
+
+    Args:
+        log_level (str): The desired log level (e.g., "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL").
+                         Should be provided in uppercase.
+
+    Returns:
+        Dict[str, Any]: A dictionary containing the logging configuration with the following structure:
+            {
+                "version": int,
+                "disable_existing_loggers": bool,
+                "formatters": Dict[str, Dict[str, Any]],
+                "handlers": Dict[str, Dict[str, Any]],
+                "loggers": Dict[str, Dict[str, Any]]
+            }
+
+    Example:
+        >>> config = get_log_config("DEBUG")
+        >>> config['loggers']['uvicorn']['level']
+        'DEBUG'
+
+    Note:
+        This function is designed to work with Uvicorn's logging system. The returned
+        configuration can be passed directly to uvicorn.run()'s log_config parameter.
+    """
+    json_config = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'formatters': {
+            'access': {
+                '()': 'uvicorn.logging.AccessFormatter',
+                'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+            },
+            'default': {
+                '()': 'uvicorn.logging.DefaultFormatter',
+                'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+            },
+        },
+        'handlers': {
+            'access': {'class': 'logging.NullHandler', 'formatter': 'access'},
+            'default': {'class': 'logging.NullHandler', 'formatter': 'default'},
+        },
+        'loggers': {
+            'uvicorn.access': {'handlers': ['access'], 'level': log_level, 'propagate': False},
+            'uvicorn.error': {'handlers': ['default'], 'level': log_level, 'propagate': False},
+        },
+    }
+    return json_config

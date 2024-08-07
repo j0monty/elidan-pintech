@@ -1,0 +1,3 @@
+[PINTECH_API]
+debug = true
+mongo_uri = "mongodb://localhost:27017"

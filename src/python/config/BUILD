@@ -8,10 +8,13 @@ python_sources(
     ],
 )
 
-
 resources(
     name="config_files",
-    sources=["settings.toml", ".secrets.toml"],
+    sources=[
+        "settings.toml",
+        ".secrets.toml",
+        "environments/*.toml",
+    ],
 )
 
 python_sources(

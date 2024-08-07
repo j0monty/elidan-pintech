@@ -1,3 +1,5 @@
+from typing import Any, Dict
+
 from common.logger import get_logger
 from config.configuration import get_component_settings
 from pydantic import BaseModel, Field
@@ -23,5 +25,5 @@ class PintechAPISettings(BaseModel):
         Returns:
             PintechAPISettings: An instance of PintechAPISettings with loaded configuration.
         """
-        settings = get_component_settings('PINTECH_API')
-        return cls(**settings.model_dump())
+        settings: Dict[str, Any] = get_component_settings('PINTECH_API')
+        return cls(**settings)

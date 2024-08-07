@@ -1,63 +1,38 @@
 import os
+from typing import Any, Dict
 
 from common.logger import get_logger
 from dynaconf import Dynaconf
-from pydantic import BaseModel
 
-current_dir = os.path.dirname(os.path.abspath(__file__))
 logger = get_logger(__name__)
 
 
-class Settings(BaseModel):
-    """Base settings class using dynaconf and Pydantic."""
-
-    @classmethod
-    def from_dynaconf(cls, prefix: str) -> 'Settings':
-        """
-        Create a Settings instance from dynaconf configuration.
-
-        Args:
-            prefix (str): The prefix to filter settings.
-
-        Returns:
-            Settings: An instance of the Settings class with filtered configuration.
-        """
-        logger.info(f'Loading settings with prefix: {prefix}')
-        dynaconf_settings = Dynaconf(
-            envvar_prefix='DYNACONF',
-            settings_files=[os.path.join(current_dir, 'settings.toml'), os.path.join(current_dir, '.secrets.toml')],
-            environments=True,
-        )
-
-        logger.debug(f'All settings: {dynaconf_settings.as_dict()}')
-
-        # Filter settings based on the prefix
-        filtered_settings = {
-            k[len(prefix) + 1 :]: v for k, v in dynaconf_settings.as_dict().items() if k.startswith(f'{prefix}_')
-        }
-        logger.debug(f'Filtered settings for {prefix}: {filtered_settings}')
-        return cls(**filtered_settings)
-
-    class Config:
-        extra = 'allow'  # Allow extra fields for flexibility
-
-
-# Create a function to get settings for a specific component
-def get_component_settings(component_name: str) -> Settings:
+def get_component_settings(component_name: str) -> Dict[str, Any]:
     """
     Get settings for a specific component.
 
     Args:
-        component_name (str): The name of the component.
+        component_name (str): The name of the component (e.g., 'PINTECH_API').
 
     Returns:
-        Settings: An instance of the Settings class for the specified component.
+        Dict[str, Any]: A dictionary of settings for the specified component.
     """
-    logger.info(f'Getting settings for component: {component_name}')
-    settings = Settings.from_dynaconf(component_name.upper())
-    logger.debug(f'Retrieved settings for {component_name}: {settings.dict()}')
-    return settings
+    env = os.getenv('PINTECH_ENV', 'development')
+    logger.info(f'Loading settings for component: {component_name} in environment: {env}')
 
+    settings = Dynaconf(
+        envvar_prefix='PINTECH',
+        settings_files=[
+            'src/python/config/settings.toml',
+            'src/python/config/.secrets.toml',
+            f'src/python/config/environments/{env}.toml',
+        ],
+        environments=True,
+        env=env,
+    )
 
-# `envvar_prefix` = export envvars with `export DYNACONF_FOO=bar`.
-# `settings_files` = Load these files in the order.
+    # Filter settings for the specific component
+    component_settings = settings.get(component_name, {})
+    logger.debug(f'Loaded settings for {component_name}: {component_settings}')
+
+    return component_settings

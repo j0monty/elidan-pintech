@@ -7,7 +7,7 @@ from typing import Any, Awaitable, Callable, Dict
 
 import uvicorn
 from asgi_correlation_id import CorrelationIdMiddleware
-from common.logger import get_logger, log_request_helper, setup_logging
+from common.logger import get_log_config, get_logger, log_request_helper, setup_logging
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -114,15 +114,23 @@ def load_log_config(config_path: str) -> Dict[str, Any]:
         FileNotFoundError: If the specified file does not exist.
         PermissionError: If the user doesn't have permission to read the file.
     """
-    with open(config_path) as config_file:
-        config = json.load(config_file)
-    return config
+    logger.info(f'Loading config file: {config_path}.')
+    try:
+        with open(config_path) as config_file:
+            config = json.load(config_file)
+        return config
+    except (json.JSONDecodeError, FileNotFoundError, PermissionError) as e:
+        exception_info: Dict[str, Any] = {
+            'exception_type': type(e).__name__,
+            'exception_message': str(e),
+            'traceback': traceback.format_exc(),
+        }
+
+        logger.error(f'Error loading config file: {e}', extra=exception_info)
+        raise e
 
 
 if __name__ == '__main__':
-    # NOTE: the log_config disabled all uvicorn logging, so if there's an issue in the underlying logging system no
-    # errors will be emitted.
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    log_config = load_log_config(os.path.join(current_dir, 'uvicorn_disable_logging.json'))
-
-    uvicorn.run(app, host='127.0.0.1', port=8000, server_header=False, log_level='debug', log_config=log_config)
+    # NOTE: the log_config disabled all uvicorn logging, so if there's an issue in the underlying common logging
+    # module no errors will be emitted. Remove the log_config to see uvicorn logging.
+    uvicorn.run(app, host='127.0.0.1', port=8000, server_header=False, log_config=get_log_config(LOG_LEVEL))
