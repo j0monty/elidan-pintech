@@ -158,7 +158,7 @@ def setup_logging(json_logs: bool = False, log_level: str = 'INFO') -> None:
         # Add extra attributes of LogRecord objects to the event dictionary
         # so that values passed in the extra parameter of log methods pass
         # through to log output.
-        # structlog.stdlib.ExtraAdder(),
+        structlog.stdlib.ExtraAdder(),
         drop_color_message_key,
         timestamper,
     ]

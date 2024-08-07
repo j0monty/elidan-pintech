@@ -1,6 +1,7 @@
 import asyncio
 import json
 import os
+import traceback
 from http import HTTPStatus
 from typing import Any, Awaitable, Callable, Dict
 
@@ -16,7 +17,7 @@ from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError
 from services.pintech_api.config import PintechAPISettings
 
 LOG_JSON_FORMAT = TypeAdapter(bool).validate_python(os.getenv('LOG_JSON_FORMAT', False))
-LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO')
+LOG_LEVEL = os.getenv('LOG_LEVEL', 'DEBUG')
 setup_logging(json_logs=LOG_JSON_FORMAT, log_level=LOG_LEVEL)
 settings: PintechAPISettings = PintechAPISettings.load()
 
@@ -70,7 +71,15 @@ async def health_check() -> JSONResponse:
     try:
         # Use asyncio.wait_for to set a timeout for the MongoDB operation
         await asyncio.wait_for(asyncio.to_thread(client.admin.command, 'ismaster'), timeout=settings.mongo_timeout)
-    except (ConnectionFailure, ServerSelectionTimeoutError, asyncio.TimeoutError):
+    except (ConnectionFailure, ServerSelectionTimeoutError, asyncio.TimeoutError) as e:
+        exception_info: Dict[str, Any] = {
+            'exception_type': type(e).__name__,
+            'exception_message': str(e),
+            'mongo_uri': settings.mongo_uri,  # Be careful not to log sensitive information
+            'mongo_timeout': settings.mongo_timeout,
+            'traceback': traceback.format_exc(),
+        }
+        logger.error('MongoDB connection failed', extra=exception_info)
         status['Datastore'] = 'FAILED'
         http_status = HTTPStatus.SERVICE_UNAVAILABLE
     finally:
