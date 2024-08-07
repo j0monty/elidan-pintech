@@ -11,11 +11,11 @@ class PintechAPISettings(BaseModel):
     """Configuration settings for the Pintech API."""
 
     debug: bool = Field(False, description='Debug mode flag')
-    api_docs_title: str = Field('PinTech API', description='Title for API documentation')
-    api_docs_desc: str = Field('PinTech API Documentation', description='Description for API documentation')
-    api_ver: str = Field('0.1', description='API version')
-    mongo_uri: str = Field('mongodb://localhost:27017', description='MongoDB connection URI')
-    mongo_timeout: int = Field(5, description='MongoDB connection timeout in seconds')
+    api_docs_title: str = Field(..., description='Title for API documentation')
+    api_docs_desc: str = Field(..., description='Description for API documentation')
+    api_ver: str = Field(..., description='API version')
+    mongo_uri: str = Field(..., description='MongoDB connection URI')
+    mongo_timeout: int = Field(..., description='MongoDB connection timeout in seconds')
 
     @classmethod
     def load(cls) -> 'PintechAPISettings':

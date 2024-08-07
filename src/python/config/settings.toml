@@ -1,6 +1,2 @@
-[PINTECH_API]
-api_docs_title = 'PinTech API'
-api_docs_description = 'PinTech API Documentation'
-api_ver = '0.1'
-mongo_uri = 'mongodb://localhost:27017'
-mongo_timeout = 5                                  # 5 second timeout
+[default]
+pintech_api = { api_docs_title = 'Default PinTech API', api_docs_desc = 'Default PinTech API Documentation', api_ver = '0.1d', mongo_uri = 'mongodb://localhost:27017', mongo_timeout = 10 }

@@ -1,3 +1,2 @@
-[PINTECH_API]
-debug = true
-mongo_uri = "mongodb://localhost:27017"
+[default]
+pintech_api = { api_docs_title = 'PinTech API', api_docs_desc = 'PinTech API Documentation', api_ver = '0.1.0', mongo_uri = 'mongodb://localhost:27017', mongo_timeout = 5 }

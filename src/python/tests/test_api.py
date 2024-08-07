@@ -31,4 +31,4 @@ def test_healthcheck_failure():
 def test_version():
     response = test_client.get('/version')
     assert response.status_code == HTTPStatus.OK  # nosec B101
-    assert response.json() == {'Version': '0.1'}  # nosec B101
+    assert response.json() == {'Version': '0.1.0'}  # nosec B101
